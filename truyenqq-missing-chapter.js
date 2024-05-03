@@ -1,5 +1,6 @@
-const SOURCE_URL = "https://truyenqqvn.com/tim-kiem-nang-cao/trang-[PAGE].html";
-const BASE_API = "https://apis.mangatruyen.vn/api/crawler/v2";
+const SOURCE_URL =
+  "https://truyenqqviet.com/tim-kiem-nang-cao/trang-[PAGE].html";
+const BASE_API = "https://apis.mangatruyen.vn/api/crawler/v3";
 const ALLOW_TYPE = ["image/png", "image/jpeg", "image/gif"];
 async function getData(api) {
   return new Promise((resolve, reject) => {
@@ -137,7 +138,7 @@ async function uploadFile(book, chapter, blob, filename) {
   f.append("file", blob);
   f.append("filename", filename);
   f.append("book_id", book.id);
-  f.append("book_slug", book.slug);
+  f.append("book_slug", book.slug_origin);
   f.append("chapter_slug", getChapSlug(chapter.url));
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -212,9 +213,13 @@ async function crawChapter(book, chapters) {
 
       if (images.length == 0) break;
 
+      await postRequest("/save-first-chapter", {
+        book_slug: book.slug_origin,
+      });
+
       // Save chapter images
       await postRequest("/save-list-image-chapter", {
-        book_slug: book.slug,
+        book_slug: book.slug_origin,
         chapter_index: i,
         chapter_slug: getChapSlug(chapters[i].url),
         images,
@@ -264,31 +269,28 @@ async function crawChapter(book, chapters) {
   }
 }
 
-async function _run(book) {
-  localStorage.setItem("TRUYENQQ_PAGE", page);
+async function _run(book, page) {
+  localStorage.setItem("MANGA_INDEX", page);
   await crawChapter(book, [
-    { slug: `https://truyenqqvn.com/truyen-tranh/${book.slug}-chap-1.html` },
+    {
+      url: `https://truyenqqviet.com/truyen-tranh/${book.slug_origin}-chap-1.html`,
+    },
   ]);
 }
 
 async function _start() {
-  let lastBook = localStorage.getItem("TRUYENQQ_LAST_BOOK") ?? 1;
-  let _start = lastBook === undefined ? true : false;
+  let index = localStorage.getItem("MANGA_INDEX") ?? 0;
+  // let _start = lastBook === undefined ? true : false;
 
-  const response = await $.get(BASE_API + "/get-book-empty");
-  const books = response?.data || [];
-
-  const max = books.length;
-  let i = 0;
-  while (i <= max) {
-    if (!_start && books[i].slug == lastBook) {
-      _start = true;
-    }
-
-    if (_start) {
-      await _run(books[i]);
-      await delay(500);
-    }
+  let i = Number(index);
+  let start = true;
+  while (start) {
+    const response = await $.post(BASE_API + "/get-book-missing?index=" + i);
+    const books = response?.data?.data || [];
+    console.log(books);
+    await _run(books, i);
+    await delay(800);
     i++;
   }
 }
+_start();
