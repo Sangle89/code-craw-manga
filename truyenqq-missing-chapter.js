@@ -72,7 +72,7 @@ const blobUrlToFile = async (blobUrl) =>
     try {
       fetch(blobUrl, {
         headers: {
-          Referer: "https://truyenqqvn.com/",
+          Referer: "https://truyenqqviet.com/",
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
           Accept:
@@ -90,7 +90,6 @@ const blobUrlToFile = async (blobUrl) =>
           });
         })
         .catch((err) => {
-          console.log(JSON.stringify(err));
           resolve(false);
         });
     } catch (err) {
@@ -237,13 +236,15 @@ async function crawChapter(book, chapters) {
         console.log("      => downloading: ", j + 1, "/", images.length);
 
         let blob = await blobUrlToFile(_image);
+        var retry_number = 0;
         if (blob === false) {
           let retry = setInterval(async function () {
             blob = await blobUrlToFile(_image);
-            if (blob) {
+            if (blob || retry_number === 3) {
               clearInterval(retry);
             }
-          }, 5500);
+            retry_number++;
+          }, 3000);
         }
 
         if (blob) {
