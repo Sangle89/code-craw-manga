@@ -169,10 +169,12 @@ async function uploadFile(book, chapter, blob, filename) {
       success: function (res) {
         resolve(res);
       },
-      error: function (err) {
-        reject(err);
-      },
-    });
+      // error: function (err) {
+      //   reject(err);
+      // },
+    })
+      .retry({ times: 3, statusCodes: [503, 504, 520] })
+      .then(function () {});
   });
 }
 
