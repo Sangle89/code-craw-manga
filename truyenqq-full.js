@@ -107,7 +107,25 @@ function isExist(data, value) {
 }
 
 async function getListChapter(book_url) {
-  const html = await $.get(book_url);
+  let html = "";
+  let retryCount = 0,
+    retry = false;
+  try {
+    html = await $.get(book_url);
+  } catch (e) {
+    retry = true;
+  }
+
+  while (retryCount < 3 && retry) {
+    console.log("======= RETRY ", retryCount);
+    try {
+      await delay(2000);
+      html = await $.get(book_url);
+      retry = false;
+    } catch (e) {}
+    retryCount += 1;
+  }
+
   const chapters = [];
   let author;
   if (html) {
