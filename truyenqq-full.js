@@ -251,14 +251,14 @@ async function crawChapter(book, chapters) {
         console.log("      => downloading: ", j + 1, "/", images.length);
 
         let blob = await blobUrlToFile(_image);
-        if (blob === false) {
-          let retry = setInterval(async function () {
-            blob = await blobUrlToFile(_image);
-            if (blob) {
-              clearInterval(retry);
-            }
-          }, 5500);
-        }
+        // if (blob === false) {
+        //   let retry = setInterval(async function () {
+        //     blob = await blobUrlToFile(_image);
+        //     if (blob) {
+        //       clearInterval(retry);
+        //     }
+        //   }, 5500);
+        // }
 
         if (blob) {
           const filename = images[j].split("?")[0].split("/").pop();
