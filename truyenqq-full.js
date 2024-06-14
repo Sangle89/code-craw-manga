@@ -1,5 +1,5 @@
 const SOURCE_URL =
-  "https://truyenqqvn.com/truyen-moi-cap-nhat/trang-[PAGE].html";
+  "https://truyenqqviet.com/truyen-moi-cap-nhat/trang-[PAGE].html";
 const BASE_API = "https://apis.mangatruyen.vn/api/crawler/v2";
 const ALLOW_TYPE = ["image/png", "image/jpeg", "image/gif"];
 async function getData(api) {
@@ -72,7 +72,7 @@ const blobUrlToFile = async (blobUrl) =>
     try {
       fetch(blobUrl, {
         headers: {
-          Referer: "https://truyenqqvn.com/",
+          Referer: "https://truyenqqviet.com/",
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
           Accept:
@@ -199,7 +199,25 @@ async function crawChapter(book, chapters) {
   console.log("Start craw chapter");
   while (i < chapters.length) {
     console.log("Crawing ", chapters[i].url);
-    const html = await $.get(chapters[i].url);
+    let html;
+    let retryCount = 0,
+      retry = false;
+    try {
+      html = await $.get(chapters[i].url);
+    } catch (e) {
+      retry = true;
+    }
+
+    while (retryCount < 3 && retry) {
+      console.log("======= RETRY ", retryCount);
+      try {
+        await delay(2000);
+        html = await $.get(chapters[i].url);
+        retry = false;
+      } catch (e) {}
+      retryCount += 1;
+    }
+
     if (html) {
       const images = [];
       $(html)
