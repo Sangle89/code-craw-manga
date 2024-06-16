@@ -45,8 +45,12 @@
 
 const SOURCE_URL =
   "https://truyenqqviet.com/truyen-moi-cap-nhat/trang-[PAGE].html";
-const BASE_API = "https://apis.mangatruyen.vn/api/crawler/v2";
+const BASE_API = "https://apis.thuekhachsan.com.vn/api/crawler/v2";
 const ALLOW_TYPE = ["image/png", "image/jpeg", "image/gif"];
+const PAGE_DELAY = 2000;
+const BOOK_DELAY = 2000;
+const CHAP_DELAY = 2000;
+const RETRY_DELAY = 2000;
 async function getData(api) {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -164,7 +168,7 @@ async function getListChapter(book_url) {
   while (retryCount < 3 && retry) {
     console.log("======= RETRY ", retryCount);
     try {
-      await delay(2000);
+      await delay(CHAP_DELAY);
       html = await $.get(book_url);
       retry = false;
     } catch (e) {}
@@ -276,7 +280,7 @@ async function crawChapter(book, chapters) {
     while (retryCount < 3 && retry) {
       console.log("======= RETRY ", retryCount);
       try {
-        await delay(2000);
+        await delay(RETRY_DELAY);
         html = await $.get(chapters[i].url);
         retry = false;
       } catch (e) {}
@@ -423,7 +427,7 @@ async function _run(page, reverse = false) {
       } else {
         throw new Error("Lỗi! không lưu được truyện.");
       }
-      await delay(2000);
+      await delay(BOOK_DELAY);
       i++;
     }
   }
@@ -435,7 +439,7 @@ async function _start1() {
   const max = 291;
   while (i <= max) {
     await _run(i);
-    await delay(500);
+    await delay(PAGE_DELAY);
     i++;
   }
 }
@@ -445,7 +449,7 @@ async function _start2() {
   let i = 262;
   while (i >= 1) {
     await _run(i, true);
-    await delay(500);
+    await delay(PAGE_DELAY);
     i--;
   }
 }
