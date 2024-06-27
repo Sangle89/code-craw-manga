@@ -163,7 +163,7 @@ async function start() {
 
       if (blob) {
         const filename = chapters[j].split("?")[0].split("/").pop();
-        await uploadFile(book.book, chapters[j].slug, blob, filename, i);
+        await uploadFile(book.book, list_chapters[i].slug, blob, filename, i);
       }
 
       j++;
