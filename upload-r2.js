@@ -49,6 +49,7 @@ async function getRequest(url) {
     $.ajax({
       url: url,
       method: "GET",
+      cache: false,
       //dataType: "application/json",
       success: function (res) {
         resolve(res);
@@ -129,8 +130,13 @@ async function uploadFile(book, chapter_slug, blob, filename) {
 const BASE_API = "https://apis.mangatruyen.vn/api/crawler/v2";
 
 const skip = localStorage.getItem("__SKIP");
-let current = skip ? Number(skip) : 23;
+const key = localStorage.getItem("__KEY");
+let current = skip ? Number(skip) : 0;
 let list_chapters = [];
+let _start = false;
+if (!key) {
+  _start = true;
+}
 async function start() {
   localStorage.setItem("__SKIP", current);
   const book = await getRequest(BASE_API + "/get-book?skip=" + current);
@@ -154,21 +160,31 @@ async function start() {
     );
     let j = 0;
     while (j < chapters.length) {
-      const _image = chapters[j].replace(
-        "https://imgur.com/",
-        "https://i.imgur.com/"
-      );
-      console.log(`============= ${j} / ${chapters.length}`);
-      let blob = await blobUrlToFile(_image);
+      if (!_start) {
+        j++;
+      } else {
+        const _image = chapters[j].replace(
+          "https://imgur.com/",
+          "https://i.imgur.com/"
+        );
 
-      if (blob) {
-        const filename = chapters[j].split("?")[0].split("/").pop();
-        await uploadFile(book.book, list_chapters[i].slug, blob, filename, i);
+        if (_image === key) {
+          _start = true;
+        }
+
+        console.log(`============= ${j} / ${chapters.length}`);
+        let blob = await blobUrlToFile(_image);
+
+        if (blob) {
+          const filename = chapters[j].split("?")[0].split("/").pop();
+          await uploadFile(book.book, list_chapters[i].slug, blob, filename, i);
+        }
+
+        //   chapter_index += 1;
+        await delay(1);
+        localStorage.setItem("__KEY", _image);
+        j++;
       }
-
-      j++;
-      //   chapter_index += 1;
-      await delay(1);
     }
 
     await delay(1);
