@@ -163,16 +163,15 @@ async function start() {
       if (!_start) {
         j++;
       } else {
-        const _image = chapters[j].replace(
-          "https://imgur.com/",
-          "https://i.imgur.com/"
-        );
+        const _image = chapters[j]
+          .replace("https://imgur.com/", "https://i.imgur.com/")
+          .replace(".truyenvua.", ".hinhhinh.");
 
         if (_image === key) {
           _start = true;
         }
 
-        console.log(`============= ${j} / ${chapters.length}`);
+        console.log(`============= ${j + 1} / ${chapters.length}`);
         let blob = await blobUrlToFile(_image);
 
         if (blob) {
