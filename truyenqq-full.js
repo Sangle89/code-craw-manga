@@ -44,8 +44,8 @@
 });
 
 const SOURCE_URL =
-  "https://truyenqqviet.com/truyen-moi-cap-nhat/trang-[PAGE].html";
-const BASE_API = "https://apis.thuekhachsan.com.vn/api/crawler/v2";
+  "https://truyenqqto.com/truyen-moi-cap-nhat/trang-[PAGE].html";
+const BASE_API = "https://manga-api.sanmmo.vn/api/crawler/v2";
 const ALLOW_TYPE = ["image/png", "image/jpeg", "image/gif"];
 const PAGE_DELAY = 2000;
 const BOOK_DELAY = 2000;
@@ -121,7 +121,7 @@ const blobUrlToFile = async (blobUrl) =>
     try {
       fetch(blobUrl, {
         headers: {
-          Referer: "https://truyenqqviet.com/",
+          Referer: "https://truyenqqto.com/",
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
           Accept:
